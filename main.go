@@ -1,17 +1,17 @@
 package main
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/ricky7171/te-marketplace/internal/injector"
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run()
+
+	// router := router.Router{}
+	// router.InitGin()
+
+	router := injector.InitializedRouter()
+	router.Run()
+
+	//accountrouter.init()
+	// router.InitApi()
+	// router.Run()
+
 }
