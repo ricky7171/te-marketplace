@@ -9,8 +9,10 @@ package injector
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
-	"github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
-	"github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
+	accountappservice "github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
+	accountdomrepository "github.com/ricky7171/te-marketplace/internal/modules/account/domain/repository"
+	accountinfrarepository "github.com/ricky7171/te-marketplace/internal/modules/account/infrastructure/repository"
+	accountpresent "github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
 	"github.com/ricky7171/te-marketplace/internal/router"
 )
 
@@ -18,7 +20,8 @@ import (
 
 func InitializedRouter() *router.Router {
 	engine := gin.Default()
-	authenticationServiceImpl := accountappservice.NewAuthenticationServiceImpl()
+	accountRepositoryPg := accountinfrarepository.NewAccountRepositoryPg()
+	authenticationServiceImpl := accountappservice.NewAuthenticationServiceImpl(accountRepositoryPg)
 	handler := accountpresent.NewHandler(authenticationServiceImpl)
 	routerRouter := router.NewRouter(engine, handler)
 	return routerRouter
@@ -26,7 +29,9 @@ func InitializedRouter() *router.Router {
 
 // injector.go:
 
-var accAppServAuthnSet = wire.NewSet(accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
+var accDomRepoSet = wire.NewSet(accountinfrarepository.NewAccountRepositoryPg, wire.Bind(new(accountdomrepository.AccountRepository), new(*accountinfrarepository.AccountRepositoryPg)))
+
+var accAppServAuthnSet = wire.NewSet(accDomRepoSet, accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
 
 var accPresentHandlerSet = wire.NewSet(accAppServAuthnSet, accountpresent.NewHandler)
 

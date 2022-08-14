@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ricky7171/te-marketplace/internal/library_wrapper"
 	accountpresent "github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
 )
 
@@ -25,7 +26,7 @@ func NewRouter(r *gin.Engine, accountHandler *accountpresent.Handler) *Router {
 
 func (router *Router) initApi() {
 	router.r.POST("/auth/login", func(ctx *gin.Context) {
-		router.accountHandler.HandleLogin(ctx)
+		router.accountHandler.HandleLogin(&library_wrapper.MyGinContextImpl{ctx})
 	})
 }
 

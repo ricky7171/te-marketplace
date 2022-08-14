@@ -3,6 +3,7 @@ package accountpresent
 import (
 	"net/http"
 
+	"github.com/ricky7171/te-marketplace/internal/library_wrapper"
 	accountappservice "github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
 
 	accountdom "github.com/ricky7171/te-marketplace/internal/modules/account/domain"
@@ -20,20 +21,19 @@ func NewHandler(authenticationService accountappservice.AuthenticationService) *
 	}
 }
 
-func (h *Handler) HandleLogin(ctx *gin.Context) {
+func (h *Handler) HandleLogin(ctx library_wrapper.MyGinContext) {
 	// bind gin request to object request and validate it
 	var req LoginRequest
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	// convert to entity
 	credential := accountdom.Credential{
 		Email:    req.Email,
 		Password: req.Password,
 	}
-
 	// run AuthenticationService
 	result, err := h.authenticationService.Login(credential)
 	if err != nil {
