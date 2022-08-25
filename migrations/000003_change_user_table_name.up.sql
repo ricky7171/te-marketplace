@@ -1,2 +1,1 @@
-ALTER TABLE "users"
-RENAME TO "accounts"
+ALTER TABLE "users" RENAME TO "accounts";

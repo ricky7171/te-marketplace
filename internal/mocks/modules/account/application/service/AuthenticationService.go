@@ -12,27 +12,41 @@ type AuthenticationService struct {
 	mock.Mock
 }
 
-// Login provides a mock function with given fields: credential
-func (_m *AuthenticationService) Login(credential accountdom.Credential) (interface{}, error) {
-	ret := _m.Called(credential)
+// Login provides a mock function with given fields: email, password
+func (_m *AuthenticationService) Login(email string, password string) (string, string, *accountdom.Account, error) {
+	ret := _m.Called(email, password)
 
-	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(accountdom.Credential) interface{}); ok {
-		r0 = rf(credential)
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string, string) string); ok {
+		r0 = rf(email, password)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interface{})
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 string
+	if rf, ok := ret.Get(1).(func(string, string) string); ok {
+		r1 = rf(email, password)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	var r2 *accountdom.Account
+	if rf, ok := ret.Get(2).(func(string, string) *accountdom.Account); ok {
+		r2 = rf(email, password)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).(*accountdom.Account)
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(accountdom.Credential) error); ok {
-		r1 = rf(credential)
+	var r3 error
+	if rf, ok := ret.Get(3).(func(string, string) error); ok {
+		r3 = rf(email, password)
 	} else {
-		r1 = ret.Error(1)
+		r3 = ret.Error(3)
 	}
 
-	return r0, r1
+	return r0, r1, r2, r3
 }
 
 type mockConstructorTestingTNewAuthenticationService interface {

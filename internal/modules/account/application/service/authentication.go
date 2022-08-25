@@ -2,40 +2,47 @@ package accountappservice
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/ricky7171/te-marketplace/internal/helper"
 
 	accountdom "github.com/ricky7171/te-marketplace/internal/modules/account/domain"
 	accountdomrepository "github.com/ricky7171/te-marketplace/internal/modules/account/domain/repository"
 )
 
 type AuthenticationService interface {
-	Login(credential accountdom.Credential) (interface{}, error)
+	Login(email string, password string) (string, string, *accountdom.Account, error)
 }
 
 // implementation
 type AuthenticationServiceImpl struct {
 	accountRepository accountdomrepository.AccountRepository
+	jwtHelper         helper.HelperJwt
 }
 
-func NewAuthenticationServiceImpl(accountRepository accountdomrepository.AccountRepository) *AuthenticationServiceImpl {
+func NewAuthenticationServiceImpl(accountRepository accountdomrepository.AccountRepository, jwtHelper helper.HelperJwt) *AuthenticationServiceImpl {
 	return &AuthenticationServiceImpl{
 		accountRepository: accountRepository,
+		jwtHelper:         jwtHelper,
 	}
 }
 
-func (service *AuthenticationServiceImpl) Login(credential accountdom.Credential) (interface{}, error) {
-	account := accountdom.NewAccount(nil, credential.Email, credential.Password, nil, nil, nil)
-	result, err := service.accountRepository.GetByFields(*account, []string{"email", "password"})
+func (service *AuthenticationServiceImpl) Login(email string, password string) (string, string, *accountdom.Account, error) {
+	// get account by email and password
+	account, err := service.accountRepository.GetByFields(map[string]string{
+		"email":    email,
+		"password": password,
+	})
+
 	if err != nil {
-		return nil, errors.New("email / password tidak ditemukan")
+		return "", "", nil, errors.New("email / password not found")
 	}
 
 	//generate JWT
+	token, refreshToken, err := service.jwtHelper.GenerateToken(account.Email, *account.Id)
+	if err != nil {
+		return "", "", nil, errors.New("failed to generate token & refresh token")
+	}
 
-	//return jwt and account data
-	fmt.Println("check result")
-	fmt.Println(result)
-
-	return account, nil
+	return token, refreshToken, account, nil
 
 }

@@ -6,6 +6,8 @@ package injector
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	"github.com/ricky7171/te-marketplace/internal/helper"
+	"github.com/ricky7171/te-marketplace/internal/library_wrapper"
 	accountappservice "github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
 	accountdomrepository "github.com/ricky7171/te-marketplace/internal/modules/account/domain/repository"
 	accountinfrarepository "github.com/ricky7171/te-marketplace/internal/modules/account/infrastructure/repository"
@@ -31,7 +33,11 @@ import (
 
 var accDomRepoSet = wire.NewSet(accountinfrarepository.NewAccountRepositoryPg, wire.Bind(new(accountdomrepository.AccountRepository), new(*accountinfrarepository.AccountRepositoryPg)))
 
-var accAppServAuthnSet = wire.NewSet(accDomRepoSet, accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
+var myJwtSet = wire.NewSet(library_wrapper.NewMyJwtImpl, wire.Bind(new(library_wrapper.MyJwt), new(*library_wrapper.MyJwtImpl)))
+
+var helperJwtSet = wire.NewSet(myJwtSet, helper.NewHelperJwtImpl, wire.Bind(new(helper.HelperJwt), new(*helper.HelperJwtImpl)))
+
+var accAppServAuthnSet = wire.NewSet(accDomRepoSet, helperJwtSet, accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
 
 var accPresentHandlerSet = wire.NewSet(accAppServAuthnSet, accountpresent.NewHandler)
 

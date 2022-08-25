@@ -18,6 +18,10 @@ type MyJwt interface {
 type MyJwtImpl struct {
 }
 
+func NewMyJwtImpl() *MyJwtImpl {
+	return &MyJwtImpl{}
+}
+
 func (myJwt *MyJwtImpl) GenerateStandardClaims(hours int) jwt.RegisteredClaims {
 	return jwt.RegisteredClaims{
 		ExpiresAt: &jwt.NumericDate{

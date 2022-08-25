@@ -11,43 +11,49 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type HelperJwt struct {
+type HelperJwt interface {
+	GenerateToken(email string, userId int) (signedToken string, signedRefreshToken string, err error)
+	ValidateToken(signedToken string) (claims *SignedTokenDetails, err error)
+	ValidateRefreshToken(signedToken string) (claims *SignedRefreshTokenDetails, err error)
+}
+
+type HelperJwtImpl struct {
 	myJwt library_wrapper.MyJwt
 }
 
 // SignedTokenDetails is representation of JWT Token payload
 type SignedTokenDetails struct {
-	Name string
-	ID   string
+	Email string
+	ID    string
 	jwt.RegisteredClaims
 }
 
 // SignedRefreshTokenDetails is representation of JWT Refresh Token payload
 type SignedRefreshTokenDetails struct {
-	Name string
-	ID   string
+	Email string
+	ID    string
 	jwt.RegisteredClaims
 }
 
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
-func NewHelperJwt(myJwt library_wrapper.MyJwt) *HelperJwt {
-	return &HelperJwt{
+func NewHelperJwtImpl(myJwt library_wrapper.MyJwt) *HelperJwtImpl {
+	return &HelperJwtImpl{
 		myJwt: myJwt,
 	}
 }
 
 // GenerateAllTokens generates both the detailed token and refresh token
-func (helper *HelperJwt) GenerateToken(name string, userId int) (signedToken string, signedRefreshToken string, err error) {
-	if name == "" || userId < 1 {
-		return "", "", errors.New("name or userid cannot be empty")
+func (helper *HelperJwtImpl) GenerateToken(email string, userId int) (signedToken string, signedRefreshToken string, err error) {
+	if email == "" || userId < 1 {
+		return "", "", errors.New("email or userid cannot be empty")
 	}
 	userIdString := strconv.Itoa(userId)
 
 	//1. generate claims for token payload
 	//token will expired 24 hours
 	claims := &SignedTokenDetails{
-		Name:             name,
+		Email:            email,
 		ID:               userIdString,
 		RegisteredClaims: helper.myJwt.GenerateStandardClaims(24),
 	}
@@ -77,7 +83,7 @@ func (helper *HelperJwt) GenerateToken(name string, userId int) (signedToken str
 
 //ValidateToken validates the jwt token
 //convert token jadi data user
-func (helper *HelperJwt) ValidateToken(signedToken string) (claims *SignedTokenDetails, err error) {
+func (helper *HelperJwtImpl) ValidateToken(signedToken string) (claims *SignedTokenDetails, err error) {
 	if signedToken == "" {
 		return nil, errors.New("empty signed token")
 	}
@@ -103,7 +109,7 @@ func (helper *HelperJwt) ValidateToken(signedToken string) (claims *SignedTokenD
 }
 
 //convert refresh_token to SignedRefreshTokenDetails that contain user id
-func (helper *HelperJwt) ValidateRefreshToken(signedToken string) (claims *SignedRefreshTokenDetails, err error) {
+func (helper *HelperJwtImpl) ValidateRefreshToken(signedToken string) (claims *SignedRefreshTokenDetails, err error) {
 	if signedToken == "" {
 		return nil, errors.New("empty signed refresh token")
 	}

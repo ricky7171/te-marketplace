@@ -13,22 +13,22 @@ type AccountRepository struct {
 	mock.Mock
 }
 
-// GetByFields provides a mock function with given fields: account, fields
-func (_m *AccountRepository) GetByFields(account accountdom.Account, fields []string) (interface{}, error) {
-	ret := _m.Called(account, fields)
+// GetByFields provides a mock function with given fields: fields
+func (_m *AccountRepository) GetByFields(fields map[string]string) (*accountdom.Account, error) {
+	ret := _m.Called(fields)
 
-	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(accountdom.Account, []string) interface{}); ok {
-		r0 = rf(account, fields)
+	var r0 *accountdom.Account
+	if rf, ok := ret.Get(0).(func(map[string]string) *accountdom.Account); ok {
+		r0 = rf(fields)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interface{})
+			r0 = ret.Get(0).(*accountdom.Account)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(accountdom.Account, []string) error); ok {
-		r1 = rf(account, fields)
+	if rf, ok := ret.Get(1).(func(map[string]string) error); ok {
+		r1 = rf(fields)
 	} else {
 		r1 = ret.Error(1)
 	}

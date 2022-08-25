@@ -31,7 +31,7 @@ func TestGenerateToken(t *testing.T) {
 	// define testcase
 	type input struct {
 		myJwtMock methodMock
-		name      string
+		email     string
 		userId    int
 	}
 
@@ -62,7 +62,7 @@ func TestGenerateToken(t *testing.T) {
 						returns: returns{"token123", nil},
 					},
 				},
-				name:   "Ricky",
+				email:  "ricky@gmail.com",
 				userId: 12,
 			},
 			expectedMethodCalls: expectedMethodCalls{
@@ -93,7 +93,7 @@ func TestGenerateToken(t *testing.T) {
 						returns: returns{"", errors.New("failed to generate new token")},
 					},
 				},
-				name:   "Ricky",
+				email:  "ricky@gmail.com",
 				userId: 12,
 			},
 			expectedMethodCalls: expectedMethodCalls{
@@ -111,11 +111,11 @@ func TestGenerateToken(t *testing.T) {
 			name: "Test invalid parameter",
 			input: input{
 				myJwtMock: methodMock{},
-				name:      "",
+				email:     "",
 				userId:    0,
 			},
 			expectedMethodCalls: expectedMethodCalls{},
-			expectedReturn:      []any{"", "", errors.New("name or userid cannot be empty")},
+			expectedReturn:      []any{"", "", errors.New("email or userid cannot be empty")},
 		},
 	}
 
@@ -124,7 +124,7 @@ func TestGenerateToken(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// define object
 			myJwtMock := mocks.NewMyJwt(t)
-			jwtHelper := helper.NewHelperJwt(myJwtMock)
+			jwtHelper := helper.NewHelperJwtImpl(myJwtMock)
 
 			// mock myjwt
 			if test.input.myJwtMock != nil {
@@ -134,7 +134,7 @@ func TestGenerateToken(t *testing.T) {
 			}
 
 			// do action
-			token, refreshToken, err := jwtHelper.GenerateToken(test.input.name, test.input.userId)
+			token, refreshToken, err := jwtHelper.GenerateToken(test.input.email, test.input.userId)
 
 			// assert calling
 			for methodName, assert := range test.expectedMethodCalls.myJwtMock {
@@ -194,8 +194,8 @@ func TestValidateToken(t *testing.T) {
 											Time: time16HourAfterNow,
 										},
 									},
-									Name: "ricky",
-									ID:   "123",
+									Email: "ricky@gmail.com",
+									ID:    "123",
 								},
 							}, nil,
 						},
@@ -214,8 +214,8 @@ func TestValidateToken(t *testing.T) {
 						Time: time16HourAfterNow,
 					},
 				},
-				Name: "ricky",
-				ID:   "123",
+				Email: "ricky@gmail.com",
+				ID:    "123",
 			}, nil},
 		},
 		{
@@ -232,8 +232,8 @@ func TestValidateToken(t *testing.T) {
 											Time: time16HourBeforeNow,
 										},
 									},
-									Name: "ricky",
-									ID:   "123",
+									Email: "ricky@gmail.com",
+									ID:    "123",
 								},
 							}, nil,
 						},
@@ -288,7 +288,7 @@ func TestValidateToken(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// define object
 			myJwtMock := mocks.NewMyJwt(t)
-			jwtHelper := helper.NewHelperJwt(myJwtMock)
+			jwtHelper := helper.NewHelperJwtImpl(myJwtMock)
 
 			// mock myjwt
 			if test.input.myJwtMock != nil {
@@ -377,8 +377,8 @@ func TestValidateRefreshToken(t *testing.T) {
 											Time: time16HourAfterNow,
 										},
 									},
-									Name: "ricky",
-									ID:   "123",
+									Email: "ricky@gmail.com",
+									ID:    "123",
 								},
 							}, nil,
 						},
@@ -397,8 +397,8 @@ func TestValidateRefreshToken(t *testing.T) {
 						Time: time16HourAfterNow,
 					},
 				},
-				Name: "ricky",
-				ID:   "123",
+				Email: "ricky@gmail.com",
+				ID:    "123",
 			}, nil},
 		},
 		{
@@ -415,8 +415,8 @@ func TestValidateRefreshToken(t *testing.T) {
 											Time: time16HourBeforeNow,
 										},
 									},
-									Name: "ricky",
-									ID:   "123",
+									Email: "ricky@gmail.com",
+									ID:    "123",
 								},
 							}, nil,
 						},
@@ -471,7 +471,7 @@ func TestValidateRefreshToken(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// define object
 			myJwtMock := mocks.NewMyJwt(t)
-			jwtHelper := helper.NewHelperJwt(myJwtMock)
+			jwtHelper := helper.NewHelperJwtImpl(myJwtMock)
 
 			// mock myjwt
 			if test.input.myJwtMock != nil {

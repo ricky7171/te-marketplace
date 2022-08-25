@@ -1,3 +1,9 @@
-ALTER TABLE "users"
-    ALTER COLUMN "email_verification_sent_at" TYPE timestamptz
-    ALTER COLUMN "forgot_password_sent_at" TYPE timestamptz
+ALTER TABLE "users" ADD COLUMN "new_email_verification_sent_at" timestamptz;
+UPDATE "users" SET "new_email_verification_sent_at" = "email_verification_sent_at"::timestamptz;
+ALTER TABLE "users" DROP COLUMN "email_verification_sent_at";
+ALTER TABLE "users" RENAME COLUMN "new_email_verification_sent_at" TO "email_verification_sent_at";
+
+ALTER TABLE "users" ADD COLUMN "new_forgot_password_sent_at" timestamptz;
+UPDATE "users" SET "new_forgot_password_sent_at" = "forgot_password_sent_at"::timestamptz;
+ALTER TABLE "users" DROP COLUMN "forgot_password_sent_at";
+ALTER TABLE "users" RENAME COLUMN "new_forgot_password_sent_at" TO "forgot_password_sent_at";

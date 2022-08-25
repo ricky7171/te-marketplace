@@ -5,5 +5,5 @@ import (
 )
 
 type AccountRepository interface {
-	GetByFields(account accountdom.Account, fields []string) (interface{}, error)
+	GetByFields(fields map[string]string) (*accountdom.Account, error)
 }

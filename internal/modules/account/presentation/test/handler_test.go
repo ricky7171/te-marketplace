@@ -2,7 +2,11 @@ package accountpresenttest
 
 import (
 	"errors"
+	"fmt"
 	"testing"
+	"time"
+
+	accountdom "github.com/ricky7171/te-marketplace/internal/modules/account/domain"
 
 	accountpresent "github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
 
@@ -34,6 +38,19 @@ func TestHandleLogin(t *testing.T) {
 		authenticationServiceMock methodAssert
 	}
 
+	// reusable value
+	idCase := new(int)
+	*idCase = 1
+
+	timeNow := time.Now()
+
+	account := accountdom.NewAccount(idCase, "ricky@gmail.com", "", nil, nil, &accountdom.TimeStampLog{
+		CreatedAt: &timeNow,
+		CreatedBy: 1,
+	})
+
+	accountWithoutTimestampCase := accountdom.NewAccount(idCase, "ricky@gmail.com", "", nil, nil, nil)
+
 	tests := []struct {
 		name                string
 		input               input
@@ -55,8 +72,8 @@ func TestHandleLogin(t *testing.T) {
 				},
 				authenticationServiceMock: methodMock{
 					"Login": {
-						params:  params{mock.Anything},
-						returns: returns{true, nil},
+						params:  params{mock.Anything, mock.Anything},
+						returns: returns{"token123", "refreshtoken123", account, nil},
 					},
 				},
 			},
@@ -65,7 +82,36 @@ func TestHandleLogin(t *testing.T) {
 					"JSON": params{200, mock.Anything},
 				},
 				authenticationServiceMock: methodAssert{
-					"Login": params{mock.Anything},
+					"Login": params{mock.Anything, mock.Anything},
+				},
+			},
+		},
+		{
+			name: "Test invalid account from DB (empty timestampt)",
+			input: input{
+				ctxMock: methodMock{
+					"ShouldBindJSON": {
+						params:  params{mock.Anything},
+						returns: returns{nil},
+					},
+					"JSON": {
+						params:  params{mock.Anything, mock.Anything},
+						returns: returns{nil},
+					},
+				},
+				authenticationServiceMock: methodMock{
+					"Login": {
+						params:  params{mock.Anything, mock.Anything},
+						returns: returns{"token123", "refreshtoken123", accountWithoutTimestampCase, nil},
+					},
+				},
+			},
+			expectedMethodCalls: expectedMethodCalls{
+				ctxMock: methodAssert{
+					"JSON": params{400, mock.Anything},
+				},
+				authenticationServiceMock: methodAssert{
+					"Login": params{mock.Anything, mock.Anything},
 				},
 			},
 		},
@@ -109,6 +155,8 @@ func TestHandleLogin(t *testing.T) {
 			// mock gin context
 			if test.input.ctxMock != nil {
 				for methodName, methodMock := range test.input.ctxMock {
+					fmt.Println("method name")
+					fmt.Println(methodName)
 					ctxMock.Mock.On(methodName, methodMock.params...).Return(methodMock.returns...)
 				}
 			}

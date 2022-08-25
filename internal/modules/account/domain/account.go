@@ -3,65 +3,65 @@ package accountdom
 import "time"
 
 type Account struct {
-	id                *int
-	email             string
-	password          string
-	emailVerification *EmailVerification
-	forgotPassword    *ForgotPassword
-	timeStampLog      *TimeStampLog
+	Id                *int
+	Email             string
+	Password          string
+	EmailVerification *EmailVerification
+	ForgotPassword    *ForgotPassword
+	TimeStampLog      *TimeStampLog
 }
 
 type EmailVerification struct {
-	emailVerificationCode   string
-	emailVerificationSentAt *time.Time
+	EmailVerificationCode   string
+	EmailVerificationSentAt *time.Time
 }
 
 type ForgotPassword struct {
-	forgotPasswordCode   string
-	forgotPasswordSentAt *time.Time
+	ForgotPasswordCode   string
+	ForgotPasswordSentAt *time.Time
 }
 
 type TimeStampLog struct {
-	createdAt *time.Time
-	updatedAt *time.Time
-	deletedAt *time.Time
-	createdBy int
-	updatedBy int
-	deletedBy int
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	DeletedAt *time.Time
+	CreatedBy int
+	UpdatedBy int
+	DeletedBy int
 }
 
 func NewAccount(id *int, email string, password string, emailVerification *EmailVerification, forgotPassword *ForgotPassword, timestampLog *TimeStampLog) *Account {
 	return &Account{
-		id:                id,
-		email:             email,
-		password:          password,
-		emailVerification: emailVerification,
-		forgotPassword:    forgotPassword,
-		timeStampLog:      timestampLog,
+		Id:                id,
+		Email:             email,
+		Password:          password,
+		EmailVerification: emailVerification,
+		ForgotPassword:    forgotPassword,
+		TimeStampLog:      timestampLog,
 	}
 }
 
 func NewEmailVerification(emailVerificationCode string, emailVerificationSentAt *time.Time) *EmailVerification {
 	return &EmailVerification{
-		emailVerificationCode:   emailVerificationCode,
-		emailVerificationSentAt: emailVerificationSentAt,
+		EmailVerificationCode:   emailVerificationCode,
+		EmailVerificationSentAt: emailVerificationSentAt,
 	}
 }
 
 func NewForgotPassword(forgotPasswordCode string, forgotPasswordSentAt *time.Time) *ForgotPassword {
 	return &ForgotPassword{
-		forgotPasswordCode:   forgotPasswordCode,
-		forgotPasswordSentAt: forgotPasswordSentAt,
+		ForgotPasswordCode:   forgotPasswordCode,
+		ForgotPasswordSentAt: forgotPasswordSentAt,
 	}
 }
 
 func NewTimeStampLog(createdAt *time.Time, updatedAt *time.Time, deletedAt *time.Time, createdBy int, updatedBy int, deletedBy int) *TimeStampLog {
 	return &TimeStampLog{
-		createdAt: createdAt,
-		updatedAt: updatedAt,
-		deletedAt: deletedAt,
-		createdBy: createdBy,
-		updatedBy: updatedBy,
-		deletedBy: deletedBy,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+		DeletedAt: deletedAt,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+		DeletedBy: deletedBy,
 	}
 }

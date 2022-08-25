@@ -11,6 +11,6 @@ func NewAccountRepositoryPg() *AccountRepositoryPg {
 	return &AccountRepositoryPg{}
 }
 
-func (repo *AccountRepositoryPg) GetByFields(account accountdom.Account, fields []string) (interface{}, error) {
+func (repo *AccountRepositoryPg) GetByFields(fields map[string]string) (*accountdom.Account, error) {
 	return nil, nil
 }

@@ -9,10 +9,12 @@ package injector
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
-	accountappservice "github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
-	accountdomrepository "github.com/ricky7171/te-marketplace/internal/modules/account/domain/repository"
-	accountinfrarepository "github.com/ricky7171/te-marketplace/internal/modules/account/infrastructure/repository"
-	accountpresent "github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
+	"github.com/ricky7171/te-marketplace/internal/helper"
+	"github.com/ricky7171/te-marketplace/internal/library_wrapper"
+	"github.com/ricky7171/te-marketplace/internal/modules/account/application/service"
+	"github.com/ricky7171/te-marketplace/internal/modules/account/domain/repository"
+	"github.com/ricky7171/te-marketplace/internal/modules/account/infrastructure/repository"
+	"github.com/ricky7171/te-marketplace/internal/modules/account/presentation"
 	"github.com/ricky7171/te-marketplace/internal/router"
 )
 
@@ -21,7 +23,9 @@ import (
 func InitializedRouter() *router.Router {
 	engine := gin.Default()
 	accountRepositoryPg := accountinfrarepository.NewAccountRepositoryPg()
-	authenticationServiceImpl := accountappservice.NewAuthenticationServiceImpl(accountRepositoryPg)
+	myJwtImpl := library_wrapper.NewMyJwtImpl()
+	helperJwtImpl := helper.NewHelperJwtImpl(myJwtImpl)
+	authenticationServiceImpl := accountappservice.NewAuthenticationServiceImpl(accountRepositoryPg, helperJwtImpl)
 	handler := accountpresent.NewHandler(authenticationServiceImpl)
 	routerRouter := router.NewRouter(engine, handler)
 	return routerRouter
@@ -31,7 +35,11 @@ func InitializedRouter() *router.Router {
 
 var accDomRepoSet = wire.NewSet(accountinfrarepository.NewAccountRepositoryPg, wire.Bind(new(accountdomrepository.AccountRepository), new(*accountinfrarepository.AccountRepositoryPg)))
 
-var accAppServAuthnSet = wire.NewSet(accDomRepoSet, accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
+var myJwtSet = wire.NewSet(library_wrapper.NewMyJwtImpl, wire.Bind(new(library_wrapper.MyJwt), new(*library_wrapper.MyJwtImpl)))
+
+var helperJwtSet = wire.NewSet(myJwtSet, helper.NewHelperJwtImpl, wire.Bind(new(helper.HelperJwt), new(*helper.HelperJwtImpl)))
+
+var accAppServAuthnSet = wire.NewSet(accDomRepoSet, helperJwtSet, accountappservice.NewAuthenticationServiceImpl, wire.Bind(new(accountappservice.AuthenticationService), new(*accountappservice.AuthenticationServiceImpl)))
 
 var accPresentHandlerSet = wire.NewSet(accAppServAuthnSet, accountpresent.NewHandler)
 
